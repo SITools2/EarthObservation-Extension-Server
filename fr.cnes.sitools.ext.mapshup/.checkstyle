@@ -4,7 +4,7 @@
   <local-check-config name="AKKA" location="D:\Sitools\workspace\fr.cnes.sitools.core\audit\checkstyle\AKKA-CheckStyle.xml" type="external" description="">
     <additional-data name="protect-config-file" value="false"/>
   </local-check-config>
-  <fileset name="all" enabled="true" check-config-name="AKKA-sitools" local="false">
+  <fileset name="all" enabled="true" check-config-name="SITools2-Checkstyle" local="false">
     <file-match-pattern match-pattern="." include-pattern="true"/>
   </fileset>
 </fileset-config>

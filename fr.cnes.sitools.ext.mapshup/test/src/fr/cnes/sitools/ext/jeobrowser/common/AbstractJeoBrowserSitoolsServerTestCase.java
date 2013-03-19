@@ -48,7 +48,7 @@ public abstract class AbstractJeoBrowserSitoolsServerTestCase extends AbstractSi
     fileCible.mkdirs();
     setUpDataDirectory(source, cible);
 
-    source = settings.getRootDirectory() + "/workspace/fr.cnes.sitools.ext.mapshup/test/data";
+    source = settings.getRootDirectory() + "/extensions/mapshup/fr.cnes.sitools.ext.mapshup/test/data";
 
     setUpDataDirectory(source, cible);
     settings.setStoreDIR(TEST_FILES_REPOSITORY + "_mapshup");
