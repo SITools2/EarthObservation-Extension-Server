@@ -4,8 +4,5 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="test/src"/>
-	<classpathentry kind="lib" path="E:/SITOOLS-2.0-GIT/cots/restlet-2.0.5-patched/org.restlet.ext.fileupload.jar"/>
-	<classpathentry kind="lib" path="E:/SITOOLS-2.0-GIT/cots/restlet-2.0.5-patched/org.restlet.ext.json.jar"/>
-	<classpathentry kind="lib" path="E:/SITOOLS-2.0-GIT/cots/restlet-2.0.5-patched/org.restlet.jar"/>
 	<classpathentry kind="output" path="out/classes"/>
 </classpath>

@@ -5,3 +5,5 @@ classes/
 *.class
 dist/
 .settings/
+documentation/
+build.num
