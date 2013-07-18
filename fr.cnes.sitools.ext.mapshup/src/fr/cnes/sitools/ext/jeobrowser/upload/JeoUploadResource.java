@@ -71,9 +71,8 @@ import fr.cnes.sitools.tasks.TaskUtils;
 import fr.cnes.sitools.util.RIAPUtils;
 
 /**
- * Upload a Zip containing a JSON object and some medias object Insert the
- * records contained in the JSON object and copy the medias object to a
- * directory Also works with a single JSON file
+ * Upload a Zip containing a JSON object and some medias object Insert the records contained in the JSON object and copy
+ * the medias object to a directory Also works with a single JSON file
  * 
  * @author m.gond
  */
@@ -109,8 +108,7 @@ public class JeoUploadResource extends SitoolsParameterizedResource {
 
     Form query = this.getRequest().getResourceRef().getQueryAsForm();
 
-    datastorageUrl = query
-        .getFirstValue(JeoUploadResourceModel.PARAM_DATASTORAGE_URL);
+    datastorageUrl = query.getFirstValue(JeoUploadResourceModel.PARAM_DATASTORAGE_URL);
     if (datastorageUrl == null || datastorageUrl.equals("")) {
       datastorageUrl = getOverrideParameterValue(JeoUploadResourceModel.PARAM_DATASTORAGE_URL);
     }
@@ -119,21 +117,15 @@ public class JeoUploadResource extends SitoolsParameterizedResource {
     application = (DataSetApplication) this.getApplication();
     dataset = application.getDataSet();
     if (dicoName != null) {
-      DictionaryMappingDTO dico = application
-          .getColumnConceptMappingDTO(dicoName);
+      DictionaryMappingDTO dico = application.getColumnConceptMappingDTO(dicoName);
       if (dico != null) {
         List<String> columnsAlias = dico.getListColumnAliasMapped(CONCEPT_NAME);
         if (columnsAlias.size() == 0) {
-          getContext().getLogger().log(
-              Level.INFO,
-              dataset.getName() + " no column mapped for concept "
-                  + CONCEPT_NAME);
+          getContext().getLogger().log(Level.INFO, dataset.getName() + " no column mapped for concept " + CONCEPT_NAME);
         }
         else if (columnsAlias.size() > 1) {
-          getContext().getLogger().log(
-              Level.INFO,
-              dataset.getName() + " too many columns mapped for concept "
-                  + CONCEPT_NAME);
+          getContext().getLogger().log(Level.INFO,
+              dataset.getName() + " too many columns mapped for concept " + CONCEPT_NAME);
         }
         else {
           columnAliasColGeometry = columnsAlias.get(0);
@@ -141,10 +133,8 @@ public class JeoUploadResource extends SitoolsParameterizedResource {
 
       }
     }
-    entryUrlInsertResource = model.getParameterByName("entryUrlInsertResource")
-        .getValue();
-    mediaUrlInsertResource = model.getParameterByName("mediaUrlInsertResource")
-        .getValue();
+    entryUrlInsertResource = model.getParameterByName("entryUrlInsertResource").getValue();
+    mediaUrlInsertResource = model.getParameterByName("mediaUrlInsertResource").getValue();
 
   }
 
@@ -155,9 +145,8 @@ public class JeoUploadResource extends SitoolsParameterizedResource {
   }
 
   /**
-   * Upload a Zip containing a JSON object and some medias object Insert the
-   * records contained in the JSON object and copy the medias object to a
-   * directory Also works with a single JSON file
+   * Upload a Zip containing a JSON object and some medias object Insert the records contained in the JSON object and
+   * copy the medias object to a directory Also works with a single JSON file
    * 
    * @param representation
    *          the Entity sent
@@ -170,24 +159,32 @@ public class JeoUploadResource extends SitoolsParameterizedResource {
     fr.cnes.sitools.common.model.Response response = null;
     this.getRequestAttributes().keySet();
     if (!getApplication().getClass().equals(DataSetApplication.class)) {
-      response = new fr.cnes.sitools.common.model.Response(false,
-          "not attached to a dataset");
+      response = new fr.cnes.sitools.common.model.Response(false, "not attached to a dataset");
       return getRepresentation(response, variant);
     }
     dataset = ((DataSetApplication) getApplication()).getDataSet();
 
     if (representation.getMediaType().isCompatible(MediaType.APPLICATION_JSON)) {
-      JsonEntry jsonEntry = new JacksonRepresentation<JsonEntry>(
-          representation, JsonEntry.class).getObject();
+      JsonEntry jsonEntry = new JacksonRepresentation<JsonEntry>(representation, JsonEntry.class).getObject();
       Entry entry = jsonEntry.getEntry();
 
       response = insertEntryMetaData(entry);
+      String insertMedia = getRequest().getResourceRef().getQueryAsForm().getFirstValue("withMedia", "false");
+      if (entry.getMedia() != null && "true".equals(insertMedia)) {
+        if (response.isSuccess()) {
+          response = insertMedia(entry);
+        }
+        if (response.isSuccess()) {
+          if (response.isSuccess()) {
+            response = new Response(true, "Records created");
+          }
+        }
+      }
     }
     else {
 
       // generate directory name
-      String directoryName = DateUtils.format(new Date(),
-          TaskUtils.getTimestampPattern());
+      String directoryName = DateUtils.format(new Date(), TaskUtils.getTimestampPattern());
 
       Representation rep = uploadFile(representation, directoryName);
 
@@ -207,8 +204,7 @@ public class JeoUploadResource extends SitoolsParameterizedResource {
           ReferenceList refList = new ReferenceList(zipDetails);
           // loop through the files of the zip
           Reference jsonRef = null;
-          for (Iterator<Reference> iterator = refList.iterator(); iterator
-              .hasNext() && jsonRef == null;) {
+          for (Iterator<Reference> iterator = refList.iterator(); iterator.hasNext() && jsonRef == null;) {
             Reference reference = iterator.next();
             if ("json".equals(reference.getExtensions())) {
               jsonRef = reference;
@@ -223,11 +219,11 @@ public class JeoUploadResource extends SitoolsParameterizedResource {
           crFile = new ClientResource(jsonRef);
           Representation json = crFile.get();
 
-          JsonEntry jsonEntry = new JacksonRepresentation<JsonEntry>(json,
-              JsonEntry.class).getObject();
+          JsonEntry jsonEntry = new JacksonRepresentation<JsonEntry>(json, JsonEntry.class).getObject();
           Entry entry = jsonEntry.getEntry();
 
           response = insertEntryMetaData(entry);
+
           if (entry.getMedia() != null) {
             if (response.isSuccess()) {
               response = insertMedia(entry);
@@ -264,8 +260,7 @@ public class JeoUploadResource extends SitoolsParameterizedResource {
   }
 
   /**
-   * Copy a set of media files contained in the zip to the specified
-   * datastorageUrl
+   * Copy a set of media files contained in the zip to the specified datastorageUrl
    * 
    * @param entry
    *          the Entry
@@ -275,12 +270,10 @@ public class JeoUploadResource extends SitoolsParameterizedResource {
    *          the storage url
    * @return a Response
    */
-  private Response copyMedia(Entry entry, ReferenceList refList,
-      String datastorageUrl) {
+  private Response copyMedia(Entry entry, ReferenceList refList, String datastorageUrl) {
     Response response = null;
     if (entry == null || refList == null) {
-      response = new Response(false,
-          "No entry specified or reference list specified");
+      response = new Response(false, "No entry specified or reference list specified");
     }
 
     for (Iterator<Reference> iterator = refList.iterator(); iterator.hasNext();) {
@@ -289,14 +282,11 @@ public class JeoUploadResource extends SitoolsParameterizedResource {
       ClientResource crFile = new ClientResource(reference);
       Representation fileToCopy = crFile.get();
 
-      int indexExcla = reference.getPath().lastIndexOf(
-          "!/" + entry.getIdentifier());
-      String fileUrl = reference.getPath().substring(
-          indexExcla + 2 + entry.getIdentifier().length());
+      int indexExcla = reference.getPath().lastIndexOf("!/" + entry.getIdentifier());
+      String fileUrl = reference.getPath().substring(indexExcla + 2 + entry.getIdentifier().length());
 
       Request reqPOST = new Request(Method.PUT, RIAPUtils.getRiapBase()
-          + settings.getString(Consts.APP_DATASTORAGE_URL) + datastorageUrl
-          + fileUrl, fileToCopy);
+          + settings.getString(Consts.APP_DATASTORAGE_URL) + datastorageUrl + fileUrl, fileToCopy);
 
       reqPOST.setClientInfo(clientInfo);
       org.restlet.Response r = null;
@@ -308,18 +298,15 @@ public class JeoUploadResource extends SitoolsParameterizedResource {
           break;
         }
         else if (Status.CLIENT_ERROR_FORBIDDEN.equals(r.getStatus())) {
-          response = new Response(false, "CLIENT_ERROR_FORBIDDEN : "
-              + reference);
+          response = new Response(false, "CLIENT_ERROR_FORBIDDEN : " + reference);
           break;
         }
         else if (Status.CLIENT_ERROR_UNAUTHORIZED.equals(r.getStatus())) {
-          response = new Response(false, "CLIENT_ERROR_UNAUTHORIZED : "
-              + reference);
+          response = new Response(false, "CLIENT_ERROR_UNAUTHORIZED : " + reference);
           break;
         }
         else if (Status.isError(r.getStatus().getCode())) {
-          response = new Response(false, "ERROR : " + r.getStatus().getName()
-              + " getting file : " + reference);
+          response = new Response(false, "ERROR : " + r.getStatus().getName() + " getting file : " + reference);
           break;
         }
         else {
@@ -352,8 +339,7 @@ public class JeoUploadResource extends SitoolsParameterizedResource {
 
     // Entry
     Record recordEntry = getRecordFromEntry(entry);
-    return insertRecord(recordEntry, dataset.getSitoolsAttachementForUsers(),
-        entryUrlInsertResource);
+    return insertRecord(recordEntry, dataset.getSitoolsAttachementForUsers(), entryUrlInsertResource);
   }
 
   /**
@@ -376,8 +362,7 @@ public class JeoUploadResource extends SitoolsParameterizedResource {
       ColumnRenderer columnRenderer = column.getColumnRenderer();
       if (columnRenderer != null
           && columnRenderer.getBehavior() != null
-          && (columnRenderer.getBehavior() == BehaviorEnum.datasetIconLink || columnRenderer
-              .getBehavior() == BehaviorEnum.datasetLink)) {
+          && (columnRenderer.getBehavior() == BehaviorEnum.datasetIconLink || columnRenderer.getBehavior() == BehaviorEnum.datasetLink)) {
         datasetMediaUrl = columnRenderer.getDatasetLinkUrl();
       }
     }
@@ -387,8 +372,7 @@ public class JeoUploadResource extends SitoolsParameterizedResource {
         // Medias
         // Video
         if (entry.getMedia().getVideo().size() > 0) {
-          response = insertMediaRecord(entry.getMedia().getVideo(),
-              datasetMediaUrl, "video", entry);
+          response = insertMediaRecord(entry.getMedia().getVideo(), datasetMediaUrl, "video", entry);
           if (response == null) {
             response = new Response(false, "Error while inserting media video");
             break;
@@ -399,8 +383,7 @@ public class JeoUploadResource extends SitoolsParameterizedResource {
         }
         // Photo
         if (entry.getMedia().getPhoto().size() > 0) {
-          response = insertMediaRecord(entry.getMedia().getPhoto(),
-              datasetMediaUrl, "photo", entry);
+          response = insertMediaRecord(entry.getMedia().getPhoto(), datasetMediaUrl, "photo", entry);
           if (response == null) {
             response = new Response(false, "Error while inserting media photo");
             break;
@@ -411,8 +394,7 @@ public class JeoUploadResource extends SitoolsParameterizedResource {
         }
         // audio
         if (entry.getMedia().getAudio().size() > 0) {
-          response = insertMediaRecord(entry.getMedia().getAudio(),
-              datasetMediaUrl, "audio", entry);
+          response = insertMediaRecord(entry.getMedia().getAudio(), datasetMediaUrl, "audio", entry);
           if (response == null) {
             response = new Response(false, "Error while inserting media audio");
             break;
@@ -438,30 +420,26 @@ public class JeoUploadResource extends SitoolsParameterizedResource {
     Record record = new Record();
     record.setId(entry.getIdentifier());
 
-    AttributeValue attrIdentifier = new AttributeValue("identifier",
-        entry.getIdentifier());
+    AttributeValue attrIdentifier = new AttributeValue("identifier", entry.getIdentifier());
     record.getAttributeValues().add(attrIdentifier);
 
     AttributeValue attrDate = new AttributeValue("date", entry.getDate());
     record.getAttributeValues().add(attrDate);
 
-    AttributeValue attrCoord = new AttributeValue(columnAliasColGeometry,
-        "POINT(" + entry.getLongitude() + " " + entry.getLatitude() + ")");
+    AttributeValue attrCoord = new AttributeValue(columnAliasColGeometry, "POINT(" + entry.getLongitude() + " "
+        + entry.getLatitude() + ")");
     record.getAttributeValues().add(attrCoord);
 
     AttributeValue attrEle = new AttributeValue("ele", entry.getEle());
     record.getAttributeValues().add(attrEle);
 
-    AttributeValue attrBuildingId = new AttributeValue("building_identifier",
-        entry.getBuilding().getIdentifier());
+    AttributeValue attrBuildingId = new AttributeValue("building_identifier", entry.getBuilding().getIdentifier());
     record.getAttributeValues().add(attrBuildingId);
 
-    AttributeValue attrBuildingPeopleNb = new AttributeValue(
-        "building_peoplenb", entry.getBuilding().getPeoplesNb());
+    AttributeValue attrBuildingPeopleNb = new AttributeValue("building_peoplenb", entry.getBuilding().getPeoplesNb());
     record.getAttributeValues().add(attrBuildingPeopleNb);
 
-    AttributeValue attrBuildingState = new AttributeValue("building_state",
-        entry.getBuilding().getState());
+    AttributeValue attrBuildingState = new AttributeValue("building_state", entry.getBuilding().getState());
     record.getAttributeValues().add(attrBuildingState);
 
     AttributeValue attrNote = new AttributeValue("notes", entry.getNotes());
@@ -482,20 +460,17 @@ public class JeoUploadResource extends SitoolsParameterizedResource {
    *          the id of the parent entry
    * @return a Record Object
    */
-  private Record getRecordFromMedia(MediaDetails media, String type,
-      String entryId) {
+  private Record getRecordFromMedia(MediaDetails media, String type, String entryId) {
     Record record = new Record();
     record.setId(type + media.getIdentifier() + entryId);
 
-    AttributeValue attrIdentifier = new AttributeValue("identifier",
-        media.getIdentifier());
+    AttributeValue attrIdentifier = new AttributeValue("identifier", media.getIdentifier());
     record.getAttributeValues().add(attrIdentifier);
 
     AttributeValue attrName = new AttributeValue("name", media.getName());
     record.getAttributeValues().add(attrName);
 
-    AttributeValue attrDirectory = new AttributeValue("directory",
-        media.getDirectory());
+    AttributeValue attrDirectory = new AttributeValue("directory", media.getDirectory());
     record.getAttributeValues().add(attrDirectory);
 
     AttributeValue attrType = new AttributeValue("type", type);
@@ -504,8 +479,7 @@ public class JeoUploadResource extends SitoolsParameterizedResource {
     AttributeValue attrEntryId = new AttributeValue("entry_id", entryId);
     record.getAttributeValues().add(attrEntryId);
 
-    AttributeValue attrExtension = new AttributeValue("extension",
-        media.getExtension());
+    AttributeValue attrExtension = new AttributeValue("extension", media.getExtension());
     record.getAttributeValues().add(attrExtension);
 
     return record;
@@ -523,10 +497,9 @@ public class JeoUploadResource extends SitoolsParameterizedResource {
    *          the Url of the resource to call
    * @return the Response of the call
    */
-  private Response insertRecord(Record record, String datasetUrl,
-      String resourceUrl) {
-    Request reqPUT = new Request(Method.PUT, RIAPUtils.getRiapBase()
-        + datasetUrl + resourceUrl, new ObjectRepresentation<Record>(record));
+  private Response insertRecord(Record record, String datasetUrl, String resourceUrl) {
+    Request reqPUT = new Request(Method.PUT, RIAPUtils.getRiapBase() + datasetUrl + resourceUrl,
+        new ObjectRepresentation<Record>(record));
 
     ArrayList<Preference<MediaType>> objectMediaType = new ArrayList<Preference<MediaType>>();
     objectMediaType.add(new Preference<MediaType>(MediaType.APPLICATION_JSON));
@@ -538,8 +511,7 @@ public class JeoUploadResource extends SitoolsParameterizedResource {
       r = getContext().getClientDispatcher().handle(reqPUT);
 
       @SuppressWarnings("unchecked")
-      XstreamRepresentation<Response> repr = (XstreamRepresentation<Response>) r
-          .getEntity();
+      XstreamRepresentation<Response> repr = (XstreamRepresentation<Response>) r.getEntity();
       resp = (Response) repr.getObject();
 
     }
@@ -550,8 +522,7 @@ public class JeoUploadResource extends SitoolsParameterizedResource {
   }
 
   /**
-   * Insert a List of Media to the given dataset. Medias are of the following
-   * type and correspond to the given entry
+   * Insert a List of Media to the given dataset. Medias are of the following type and correspond to the given entry
    * 
    * @param medias
    *          the List of medias
@@ -563,11 +534,9 @@ public class JeoUploadResource extends SitoolsParameterizedResource {
    *          the Entry
    * @return a Response
    */
-  private Response insertMediaRecord(List<MediaDetails> medias,
-      String datasetUrl, String type, Entry entry) {
+  private Response insertMediaRecord(List<MediaDetails> medias, String datasetUrl, String type, Entry entry) {
     Response response = null;
-    for (Iterator<MediaDetails> iterator = medias.iterator(); iterator
-        .hasNext();) {
+    for (Iterator<MediaDetails> iterator = medias.iterator(); iterator.hasNext();) {
       MediaDetails details = iterator.next();
       Record rec = getRecordFromMedia(details, type, entry.getIdentifier());
       response = insertRecord(rec, datasetUrl, mediaUrlInsertResource);
@@ -605,8 +574,8 @@ public class JeoUploadResource extends SitoolsParameterizedResource {
   // }
 
   /**
-   * Upload a File contained in the given entity to the temporary folder of the
-   * Sitools Server at the given directory name
+   * Upload a File contained in the given entity to the temporary folder of the Sitools Server at the given directory
+   * name
    * 
    * @param entity
    *          the file to upload
@@ -619,8 +588,7 @@ public class JeoUploadResource extends SitoolsParameterizedResource {
     Representation rep = null;
     if (entity != null) {
       settings = ((SitoolsApplication) getApplication()).getSettings();
-      File storeDirectory = new File(settings.getTmpFolderUrl() + "/"
-          + directoryName);
+      File storeDirectory = new File(settings.getTmpFolderUrl() + "/" + directoryName);
       storeDirectory.mkdirs();
 
       if (MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true)) {
@@ -674,8 +642,7 @@ public class JeoUploadResource extends SitoolsParameterizedResource {
               filePath = file.getAbsolutePath();
             }
             catch (Exception e) {
-              System.out.println("Can't write the content of " + file.getPath()
-                  + " due to " + e.getMessage());
+              System.out.println("Can't write the content of " + file.getPath() + " due to " + e.getMessage());
               oops.add(file.getName());
             }
           }
@@ -715,17 +682,14 @@ public class JeoUploadResource extends SitoolsParameterizedResource {
         }
         else {
           // Some problem occurs, sent back a simple line of text.
-          rep = new StringRepresentation("no file uploaded",
-              MediaType.TEXT_PLAIN);
+          rep = new StringRepresentation("no file uploaded", MediaType.TEXT_PLAIN);
         }
       }
       else {
         String fileName = "tmp_zip.zip";
-        String resourceRef = RIAPUtils.getRiapBase()
-            + settings.getString(Consts.APP_TMP_FOLDER_URL) + "/"
+        String resourceRef = RIAPUtils.getRiapBase() + settings.getString(Consts.APP_TMP_FOLDER_URL) + "/"
             + directoryName + "/" + fileName;
-        filePath = settings.getTmpFolderUrl() + "/" + directoryName + "/"
-            + fileName;
+        filePath = settings.getTmpFolderUrl() + "/" + directoryName + "/" + fileName;
         // Transfer of PUT calls is only allowed if the readOnly flag is
         // not set.
         Request contextRequest = new Request(Method.PUT, resourceRef);
@@ -734,11 +698,9 @@ public class JeoUploadResource extends SitoolsParameterizedResource {
         contextRequest.getRanges().addAll(getRanges());
         contextRequest.setEntity(entity);
 
-        org.restlet.Response contextResponse = new org.restlet.Response(
-            contextRequest);
+        org.restlet.Response contextResponse = new org.restlet.Response(contextRequest);
         contextRequest.setResourceRef(resourceRef);
-        getContext().getClientDispatcher().handle(contextRequest,
-            contextResponse);
+        getContext().getClientDispatcher().handle(contextRequest, contextResponse);
         setStatus(contextResponse.getStatus());
 
       }
