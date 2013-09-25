@@ -36,7 +36,6 @@
 
 
 <target name="jar-extensions">
-	<delete file="modules.jar" />
 	<property name="version.num" value="1.00" />
 	<buildnumber file="build.num" />
 	<jar jarfile="${dist.dir}/${project.name}.jar" basedir="${out.classes.dir}"
