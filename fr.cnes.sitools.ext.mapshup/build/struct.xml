@@ -32,7 +32,7 @@
 <!-- Informations generales sur le projet -->
 <property name="project.name" value="fr.cnes.sitools.ext.mapshup" />
 <property name="project.fullname" value="Sitools2" />
-<property name="project.version"         value="2.2"/>
+<property name="project.version"         value="2.3.1"/>
 
 
 <!-- Nom de l'application WEB -->
@@ -114,16 +114,16 @@
 <property name="deploy.remote.dir" value="${deploy.ftp.dir}" />
 
 <path id="compile.classpath">
-	<pathelement location="${comp.cp.dir}/fr.cnes.sitools.core.jar" />
 	<path refid="restlet_jse_2_0_5_patched" />
 	<path refid="sitools_libraries" />
+	<pathelement location="${comp.cp.dir}/fr.cnes.sitools.core.jar" />
 </path>
 
 
 <!-- Classpath pour l'execution des tests -->
 <path id="test.classpath">
-	<path refid="test" />
-	<path refid="compile.classpath" />
+	<path refid="compile.classpath"/>
+	<path refid="test"/>
 	<pathelement location="${out.classes.dir}" />
 	<pathelement location="${test.classes.dir}" />
 	<pathelement location="${test.conf.dir}" />
